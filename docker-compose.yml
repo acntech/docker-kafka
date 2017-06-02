@@ -1,0 +1,11 @@
+version: "2"
+
+services:
+  acntech_kafka:
+    build: .
+    image: acntech/kafka:latest
+    container_name: acntech-kafka
+    hostname: kafka.acntech.internal
+    ports:
+      - "9000:9000"
+      - "9092:9092"
