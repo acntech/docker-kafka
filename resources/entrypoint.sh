@@ -10,17 +10,17 @@ if [ ! -f ${KAFKA_CONFIGURED_FLAG} ]; then
    echo "Configuring Kafka..."
 
    KAFKA_BROKER_ID=${KAFKA_BROKER_ID:-0}
+   KAFKA_ADVERTISED_LISTENERS=${KAFKA_ADVERTISED_LISTENERS:-localhost:9092}
    ZOOKEEPER_HOSTS=${ZOOKEEPER_HOSTS:-localhost:2181}
 
-   echo "Sanitizing old Kafka configuration..."
-   sed -i 's/broker\.id=.*//g' ${KAFKA_SERVER_PROPERTIES}
-   sed -i 's/zookeeper\.connect=.*//g' ${KAFKA_SERVER_PROPERTIES}
-
    echo "Setting Kafka broker ID: ${KAFKA_BROKER_ID}"
-   echo "broker.id=${KAFKA_BROKER_ID}" >> ${KAFKA_SERVER_PROPERTIES}
+   sed -i 's/^#*broker\.id=.*/broker.id='"${KAFKA_BROKER_ID}"'/g' ${KAFKA_SERVER_PROPERTIES}
+
+   echo "Setting Kafka advertised listeners: ${KAFKA_ADVERTISED_LISTENERS}"
+   sed -i 's/^#*advertised\.listeners=.*/advertised.listeners=PLAINTEXT:\/\/'"${KAFKA_ADVERTISED_LISTENERS}"'/g' ${KAFKA_SERVER_PROPERTIES}
 
    echo "Setting ZooKeeper hosts: ${ZOOKEEPER_HOSTS}"
-   echo "zookeeper.connect=${ZOOKEEPER_HOSTS}" >> ${KAFKA_SERVER_PROPERTIES}
+   sed -i 's/^#*zookeeper\.connect=.*/zookeeper.connect='"${ZOOKEEPER_HOSTS}"'/g' ${KAFKA_SERVER_PROPERTIES}
 
    date > ${KAFKA_CONFIGURED_FLAG}
 
