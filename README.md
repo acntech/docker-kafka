@@ -1,7 +1,7 @@
 # docker-kafka
 Docker image with Apache Kafka, based on the acntech/jre image
 
-Kafka needs Apache ZooKeeper in order to coordinate it's cluter nodes and runtime operations.
+Kafka needs Apache ZooKeeper in order to coordinate nodes and runtime operations.
 
 ## Configuration
 The Kafka instance can be configures using the following environment variables:
