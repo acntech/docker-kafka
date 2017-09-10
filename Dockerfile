@@ -2,21 +2,24 @@ FROM acntechie/jre
 MAINTAINER Thomas Johansen "thomas.johansen@accenture.com"
 
 
-ARG KAFKA_VERSION=0.10.2.1
+ARG KAFKA_VERSION=0.11.0.0
 ARG SCALA_VERSION=2.12
 ARG KAFKA_DIR=kafka_${SCALA_VERSION}-${KAFKA_VERSION}
 
 
 ENV KAFKA_BASE /opt/kafka
 ENV KAFKA_HOME ${KAFKA_BASE}/default
+ENV KAFKA_DATA_DIR /var/lib/kafka
 ENV KAFKA_LOG_DIR /var/log/kafka
 ENV PATH ${PATH}:${KAFKA_HOME}/bin
 
 
 RUN apt-get update && \
-    apt-get -y upgrade
+    apt-get -y upgrade && \
+    rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p ${KAFKA_BASE} && \
+    mkdir ${KAFKA_DATA_DIR} && \
     mkdir ${KAFKA_LOG_DIR}
 
 RUN wget --no-cookies \
@@ -43,9 +46,10 @@ RUN tar -xzvf /tmp/kafka.tar.gz -C ${KAFKA_BASE}/ && \
     rm -f /tmp/kafka.*
 
 
-COPY ./resources/entrypoint.sh /entrypoint.sh
+COPY resources/entrypoint.sh /entrypoint.sh
 
 
+RUN chown -R root:root ${KAFKA_BASE}
 RUN chmod +x /entrypoint.sh
 
 
@@ -56,6 +60,7 @@ WORKDIR ${KAFKA_HOME}
 
 
 VOLUME "${KAFKA_HOME}/config"
+VOLUME "${KAFKA_DATA_DIR}"
 VOLUME "${KAFKA_LOG_DIR}"
 
 
