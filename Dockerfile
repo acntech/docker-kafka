@@ -18,10 +18,6 @@ RUN apt-get update && \
     apt-get -y upgrade && \
     rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p ${KAFKA_BASE} && \
-    mkdir ${KAFKA_DATA_DIR} && \
-    mkdir ${KAFKA_LOG_DIR}
-
 RUN wget --no-cookies \
          --no-check-certificate \
          "https://dist.apache.org/repos/dist/release/kafka/${KAFKA_VERSION}/${KAFKA_DIR}.tgz" \
@@ -40,7 +36,10 @@ RUN wget --no-cookies \
 RUN gpg --import /tmp/kafka.KEYS && \
     gpg --batch --verify /tmp/kafka.tar.gz.asc /tmp/kafka.tar.gz
 
-RUN tar -xzvf /tmp/kafka.tar.gz -C ${KAFKA_BASE}/ && \
+RUN mkdir -p ${KAFKA_BASE} && \
+    mkdir ${KAFKA_DATA_DIR} && \
+    mkdir ${KAFKA_LOG_DIR} && \
+    tar -xzvf /tmp/kafka.tar.gz -C ${KAFKA_BASE}/ && \
     cd ${KAFKA_BASE} && \
     ln -s ${KAFKA_DIR}/ default && \
     rm -f /tmp/kafka.*

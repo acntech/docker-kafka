@@ -6,13 +6,21 @@ Kafka needs Apache ZooKeeper in order to coordinate nodes and runtime operations
 ## Configuration
 The Kafka instance can be configures using the following environment variables:
 * ```KAFKA_BROKER_ID```: A unique ID for the instance.
+* ```KAFKA_PORT```: The port the Kafka broker listener will listen on.
+* ```KAFKA_HOST```: The hostname the Kafka broker listener will bind to.
+* ```KAFKA_LISTENERS```: The hostname and port the Kafka broker will listen on.
+* ```KAFKA_LISTENER_PROTOCOL```: The network protocol used for the listeners.
 * ```KAFKA_ADVERTISED_LISTENERS```: The hostname and port the Kafka broker will advertise to producers and consumers.
 * ```KAFKA_ADVERTISED_LISTENER_PROTOCOL```: The network protocol used for the advertised listeners.
 * ```ZOOKEEPER_HOSTS```: A comma separated string of ZooKeeper hosts that Kafka will use for cluster orchestration.
 
 #### Default values
 * ```KAFKA_BROKER_ID```: ```1```
-* ```KAFKA_ADVERTISED_LISTENERS```: ```$(hostname):9092```
+* ```KAFKA_PORT```: ```9092```
+* ```KAFKA_HOST```: ```$(hostname)```
+* ```KAFKA_LISTENERS```: ```${KAFKA_HOST}:${KAFKA_PORT}```
+* ```KAFKA_LISTENERS_PROTOCOL```: ```PLAINTEXT```
+* ```KAFKA_ADVERTISED_LISTENERS```: ```:${KAFKA_PORT}```
 * ```KAFKA_ADVERTISED_LISTENERS_PROTOCOL```: ```PLAINTEXT```
 * ```ZOOKEEPER_HOSTS```: ```$(hostname):2181```
 
@@ -83,9 +91,10 @@ services:
     image: acntechie/kafka
     container_name: friendly_kafka_1
     ports:
-      - "9091:9092"
+      - "9091:9091"
     environment:
       - KAFKA_BROKER_ID=1
+      - KAFKA_PORT=9091
       - ZOOKEEPER_HOSTS=friendly_zookeeper_1:2181,friendly_zookeeper_2:2181,friendly_zookeeper_3:2181
     depends_on:
       - friendly_zookeeper_1
@@ -101,6 +110,7 @@ services:
       - "9092:9092"
     environment:
       - KAFKA_BROKER_ID=2
+      - KAFKA_PORT=9092
       - ZOOKEEPER_HOSTS=friendly_zookeeper_1:2181,friendly_zookeeper_2:2181,friendly_zookeeper_3:2181
     depends_on:
       - friendly_zookeeper_1
@@ -113,9 +123,10 @@ services:
     image: acntechie/kafka
     container_name: friendly_kafka_3
     ports:
-      - "9093:9092"
+      - "9093:9093"
     environment:
       - KAFKA_BROKER_ID=3
+      - KAFKA_PORT=9093
       - ZOOKEEPER_HOSTS=friendly_zookeeper_1:2181,friendly_zookeeper_2:2181,friendly_zookeeper_3:2181
     depends_on:
       - friendly_zookeeper_1
