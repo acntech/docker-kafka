@@ -2,7 +2,7 @@ FROM acntechie/jre
 MAINTAINER Thomas Johansen "thomas.johansen@accenture.com"
 
 
-ARG KAFKA_VERSION=0.11.0.0
+ARG KAFKA_VERSION=1.0.0
 ARG SCALA_VERSION=2.12
 ARG KAFKA_DIR=kafka_${SCALA_VERSION}-${KAFKA_VERSION}
 
