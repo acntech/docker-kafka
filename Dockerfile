@@ -1,9 +1,10 @@
-FROM acntechie/jre
+FROM openjdk:8-jre
 MAINTAINER Thomas Johansen "thomas.johansen@accenture.com"
 
 
-ARG KAFKA_VERSION=1.0.0
+ARG KAFKA_VERSION=2.0.1
 ARG SCALA_VERSION=2.12
+ARG KAFKA_MIRROR=https://dist.apache.org/repos/dist/release/kafka
 ARG KAFKA_DIR=kafka_${SCALA_VERSION}-${KAFKA_VERSION}
 
 
@@ -11,7 +12,11 @@ ENV KAFKA_BASE /opt/kafka
 ENV KAFKA_HOME ${KAFKA_BASE}/default
 ENV KAFKA_DATA_DIR /var/lib/kafka
 ENV KAFKA_LOG_DIR /var/log/kafka
+ENV LOG_DIR ${KAFKA_LOG_DIR}
 ENV PATH ${PATH}:${KAFKA_HOME}/bin
+
+
+WORKDIR /tmp
 
 
 RUN apt-get update && \
@@ -20,29 +25,29 @@ RUN apt-get update && \
 
 RUN wget --no-cookies \
          --no-check-certificate \
-         "https://dist.apache.org/repos/dist/release/kafka/${KAFKA_VERSION}/${KAFKA_DIR}.tgz" \
-         -O /tmp/kafka.tar.gz
+         "${KAFKA_MIRROR}/${KAFKA_VERSION}/kafka_${SCALA_VERSION}-${KAFKA_VERSION}.tgz" \
+         -O kafka.tar.gz
 
 RUN wget --no-cookies \
          --no-check-certificate \
-         "https://dist.apache.org/repos/dist/release/kafka/${KAFKA_VERSION}/${KAFKA_DIR}.tgz.asc" \
-         -O /tmp/kafka.tar.gz.asc
+         "${KAFKA_MIRROR}/${KAFKA_VERSION}/kafka_${SCALA_VERSION}-${KAFKA_VERSION}.tgz.asc" \
+         -O kafka.tar.gz.asc
 
 RUN wget --no-cookies \
          --no-check-certificate \
-         "https://dist.apache.org/repos/dist/release/kafka/KEYS" \
-         -O /tmp/kafka.KEYS
+         "${KAFKA_MIRROR}/KEYS" \
+         -O kafka.KEYS
 
-RUN gpg --import /tmp/kafka.KEYS && \
-    gpg --batch --verify /tmp/kafka.tar.gz.asc /tmp/kafka.tar.gz
+RUN gpg --import --no-tty kafka.KEYS && \
+    gpg --batch --verify --no-tty kafka.tar.gz.asc kafka.tar.gz
 
 RUN mkdir -p ${KAFKA_BASE} && \
     mkdir ${KAFKA_DATA_DIR} && \
     mkdir ${KAFKA_LOG_DIR} && \
-    tar -xzvf /tmp/kafka.tar.gz -C ${KAFKA_BASE}/ && \
+    tar -xzvf kafka.tar.gz -C ${KAFKA_BASE}/ && \
     cd ${KAFKA_BASE} && \
     ln -s ${KAFKA_DIR}/ default && \
-    rm -f /tmp/kafka.*
+    rm -f kafka.*
 
 
 COPY resources/entrypoint.sh /entrypoint.sh

@@ -1,5 +1,5 @@
 # Kafka
-Docker image with Apache Kafka, based on the acntechie/jre image
+Docker image with Apache Kafka, based on the openjdk:8-jre image
 
 Kafka needs Apache ZooKeeper in order to coordinate nodes and runtime operations.
 
