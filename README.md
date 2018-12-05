@@ -7,22 +7,17 @@ Kafka needs Apache ZooKeeper in order to coordinate nodes and runtime operations
 The Kafka instance can be configures using the following environment variables:
 * ```KAFKA_BROKER_ID```: A unique ID for the instance.
 * ```KAFKA_PORT```: The port the Kafka broker listener will listen on.
-* ```KAFKA_HOST```: The hostname the Kafka broker listener will bind to.
+* ```KAFKA_PROTOCOL```: The protocol used for the listeners.
 * ```KAFKA_LISTENERS```: The hostname and port the Kafka broker will listen on.
-* ```KAFKA_LISTENER_PROTOCOL```: The network protocol used for the listeners.
 * ```KAFKA_ADVERTISED_LISTENERS```: The hostname and port the Kafka broker will advertise to producers and consumers.
-* ```KAFKA_ADVERTISED_LISTENER_PROTOCOL```: The network protocol used for the advertised listeners.
 * ```ZOOKEEPER_HOSTS```: A comma separated string of ZooKeeper hosts that Kafka will use for cluster orchestration.
 
 #### Default values
 * ```KAFKA_BROKER_ID```: ```1```
 * ```KAFKA_PORT```: ```9092```
-* ```KAFKA_HOST```: ```$(hostname)```
-* ```KAFKA_LISTENERS```: ```${KAFKA_HOST}:${KAFKA_PORT}```
-* ```KAFKA_LISTENERS_PROTOCOL```: ```PLAINTEXT```
-* ```KAFKA_ADVERTISED_LISTENERS```: ```:${KAFKA_PORT}```
-* ```KAFKA_ADVERTISED_LISTENERS_PROTOCOL```: ```PLAINTEXT```
-* ```ZOOKEEPER_HOSTS```: ```$(hostname):2181```
+* ```KAFKA_PROTOCOL```: ```PLAINTEXT```
+* ```KAFKA_LISTENERS```: ```${KAFKA_PROTOCOL}://0.0.0.0:${KAFKA_PORT}```
+* ```KAFKA_ADVERTISED_LISTENERS```: ```${KAFKA_PROTOCOL}://localhost:${KAFKA_PORT}```
 
 ## Running single instrance
 To run a stand-alone Kafka node you need minimal configuration.

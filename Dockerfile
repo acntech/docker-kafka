@@ -2,9 +2,10 @@ FROM openjdk:8-jre
 MAINTAINER Thomas Johansen "thomas.johansen@accenture.com"
 
 
-ARG KAFKA_VERSION=2.0.1
+ARG KAFKA_VERSION=2.1.0
 ARG SCALA_VERSION=2.12
 ARG KAFKA_MIRROR=https://dist.apache.org/repos/dist/release/kafka
+ARG KAFKA_KEY_MIRROR=https://dist.apache.org/repos/dist/release/kafka
 ARG KAFKA_DIR=kafka_${SCALA_VERSION}-${KAFKA_VERSION}
 
 
@@ -30,12 +31,12 @@ RUN wget --no-cookies \
 
 RUN wget --no-cookies \
          --no-check-certificate \
-         "${KAFKA_MIRROR}/${KAFKA_VERSION}/kafka_${SCALA_VERSION}-${KAFKA_VERSION}.tgz.asc" \
+         "${KAFKA_KEY_MIRROR}/${KAFKA_VERSION}/kafka_${SCALA_VERSION}-${KAFKA_VERSION}.tgz.asc" \
          -O kafka.tar.gz.asc
 
 RUN wget --no-cookies \
          --no-check-certificate \
-         "${KAFKA_MIRROR}/KEYS" \
+         "${KAFKA_KEY_MIRROR}/KEYS" \
          -O kafka.KEYS
 
 RUN gpg --import --no-tty kafka.KEYS && \
