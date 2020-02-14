@@ -2,8 +2,8 @@ FROM openjdk:8-jre
 MAINTAINER Thomas Johansen "thomas.johansen@accenture.com"
 
 
-ARG KAFKA_VERSION=2.3.1
-ARG SCALA_VERSION=2.12
+ARG KAFKA_VERSION=2.4.0
+ARG SCALA_VERSION=2.13
 ARG KAFKA_MIRROR=https://dist.apache.org/repos/dist/release/kafka
 ARG KAFKA_KEY_MIRROR=https://dist.apache.org/repos/dist/release/kafka
 ARG KAFKA_DIR=kafka_${SCALA_VERSION}-${KAFKA_VERSION}
