@@ -2,7 +2,7 @@ FROM openjdk:11-jre
 MAINTAINER Thomas Johansen "thomas.johansen@accenture.com"
 
 
-ARG KAFKA_VERSION=2.6.0
+ARG KAFKA_VERSION=2.7.0
 ARG SCALA_VERSION=2.13
 ARG KAFKA_MIRROR=https://dist.apache.org/repos/dist/release/kafka
 ARG KAFKA_KEY_MIRROR=https://dist.apache.org/repos/dist/release/kafka
