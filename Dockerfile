@@ -2,7 +2,7 @@ FROM openjdk:11-jre
 MAINTAINER Thomas Johansen "thomas.johansen@accenture.com"
 
 
-ARG KAFKA_VERSION=2.7.0
+ARG KAFKA_VERSION=2.8.0
 ARG SCALA_VERSION=2.13
 ARG KAFKA_MIRROR=https://dist.apache.org/repos/dist/release/kafka
 ARG KAFKA_KEY_MIRROR=https://dist.apache.org/repos/dist/release/kafka
@@ -11,8 +11,9 @@ ARG KAFKA_DIR=kafka_${SCALA_VERSION}-${KAFKA_VERSION}
 
 ENV KAFKA_BASE /opt/kafka
 ENV KAFKA_HOME ${KAFKA_BASE}/default
-ENV KAFKA_DATA_DIR /var/lib/kafka
-ENV KAFKA_LOG_DIR /var/log/kafka
+ENV KAFKA_DATA_ROOT /var/lib/kafka
+ENV KAFKA_DATA_DIR ${KAFKA_DATA_ROOT}/data
+ENV KAFKA_LOG_DIR ${KAFKA_DATA_ROOT}/logs
 ENV LOG_DIR ${KAFKA_LOG_DIR}
 ENV PATH ${PATH}:${KAFKA_HOME}/bin
 
@@ -43,19 +44,21 @@ RUN gpg --import --no-tty kafka.KEYS && \
     gpg --batch --verify --no-tty kafka.tar.gz.asc kafka.tar.gz
 
 RUN mkdir -p ${KAFKA_BASE} && \
-    mkdir ${KAFKA_DATA_DIR} && \
-    mkdir ${KAFKA_LOG_DIR} && \
-    tar -xzvf kafka.tar.gz -C ${KAFKA_BASE}/ && \
+    mkdir -p ${KAFKA_DATA_DIR} && \
+    mkdir -p ${KAFKA_LOG_DIR} && \
+    cd /var/log && \
+    ln -s ${KAFKA_LOG_DIR}/ kafka && \
+    tar -xzvf /tmp/kafka.tar.gz -C ${KAFKA_BASE}/ && \
     cd ${KAFKA_BASE} && \
     ln -s ${KAFKA_DIR}/ default && \
-    rm -f kafka.*
+    rm -f /tmp/kafka.*
 
 
 COPY resources/entrypoint.sh /entrypoint.sh
 
 
-RUN chown -R root:root ${KAFKA_BASE}
-RUN chmod +x /entrypoint.sh
+RUN chown -R root:root ${KAFKA_BASE} && \
+    chmod +x /entrypoint.sh
 
 
 EXPOSE 9000 9092
@@ -64,9 +67,7 @@ EXPOSE 9000 9092
 WORKDIR ${KAFKA_HOME}
 
 
-VOLUME "${KAFKA_HOME}/config"
-VOLUME "${KAFKA_DATA_DIR}"
-VOLUME "${KAFKA_LOG_DIR}"
+VOLUME "${KAFKA_DATA_ROOT}"
 
 
 ENTRYPOINT ["/entrypoint.sh"]
