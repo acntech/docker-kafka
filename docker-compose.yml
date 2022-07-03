@@ -1,9 +1,6 @@
-version: "2"
+version: "3.5"
 
 services:
-  acntech_kafka:
-    build:
-      context: .
-      args:
-        - KAFKA_MIRROR=http://apache.uib.no/kafka
+  acntech.kafka:
+    build: .
     image: acntechie/kafka:latest

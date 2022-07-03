@@ -30,40 +30,41 @@ docker network create zookeeper
 
 Start an instance of ZooKeeper
 ```
-docker run -d -name lonely_zookeeper --net zookeeper acntechie/zookeeper
+docker run -d -name lonely.zookeeper --net zookeeper acntechie/zookeeper
 ```
 
 Now start a Kafka instance:
 ```
-docker run -d -name lonely_kafka -p 9092:9092 --net zookeeper --env ZOOKEEPER_HOSTS=lonely_zookeeper:2181 acntechie/kafka
+docker run -d -name lonely.kafka -p 9092:9092 --net zookeeper --env ZOOKEEPER_HOSTS=lonely.zookeeper:2181 acntechie/kafka
 ```
 
 #### Docker Compose
 Define a ```docker-compose.yml``` file along the lines of:
 ```
-version: "2"
+version: "3.5"
 
 services:
-  lonely_kafka:
+  lonely.kafka:
     image: acntechie/kafka
-    container_name: lonely_kafka
+    container_name: lonely.kafka
     ports:
       - "9092:9092"
     environment:
-      - ZOOKEEPER_HOSTS=lonely_zookeeper:2181
+      - ZOOKEEPER_HOSTS=lonely.zookeeper:2181
     depends_on:
-      - lonely_zookeeper
+      - lonely.zookeeper
     networks:
-    - zookeeper
+    - kafka
 
-  lonely_zookeeper:
+  lonely.zookeeper:
     image: acntechie/zookeeper
-    container_name: lonely_zookeeper
+    container_name: lonely.zookeeper
     networks:
-    - zookeeper
+    - kafka
 
 networks:
-  zookeeper:
+  kafka:
+    name: kafka
 ```
 
 Then run ```docker-compose up -d``` to create and start a container in daemon mode.
@@ -79,86 +80,87 @@ This requires quite a lot of commands, which is too complex for this README. Ple
 #### Docker Compose
 Define a ```docker-compose.yml``` file along the lines of:
 ```
-version: "2"
+version: "3.5"
 
 services:
-  friendly_kafka_1:
+  friendly.kafka.1:
     image: acntechie/kafka
-    container_name: friendly_kafka_1
+    container_name: friendly.kafka.1
     ports:
       - "9091:9091"
     environment:
       - KAFKA_BROKER_ID=1
       - KAFKA_PORT=9091
-      - ZOOKEEPER_HOSTS=friendly_zookeeper_1:2181,friendly_zookeeper_2:2181,friendly_zookeeper_3:2181
+      - ZOOKEEPER_HOSTS=friendly.zookeeper.1:2181,friendly.zookeeper.2:2181,friendly.zookeeper.3:2181
     depends_on:
-      - friendly_zookeeper_1
-      - friendly_zookeeper_2
-      - friendly_zookeeper_3
+      - friendly.zookeeper.1
+      - friendly.zookeeper.2
+      - friendly.zookeeper.3
     networks:
-    - zookeeper
+    - kafka
 
-  friendly_kafka_2:
+  friendly.kafka.2:
     image: acntechie/kafka
-    container_name: friendly_kafka_2
+    container_name: friendly.kafka.2
     ports:
       - "9092:9092"
     environment:
       - KAFKA_BROKER_ID=2
       - KAFKA_PORT=9092
-      - ZOOKEEPER_HOSTS=friendly_zookeeper_1:2181,friendly_zookeeper_2:2181,friendly_zookeeper_3:2181
+      - ZOOKEEPER_HOSTS=friendly.zookeeper.1:2181,friendly.zookeeper.2:2181,friendly.zookeeper.3:2181
     depends_on:
-      - friendly_zookeeper_1
-      - friendly_zookeeper_2
-      - friendly_zookeeper_3
+      - friendly.zookeeper.1
+      - friendly.zookeeper.2
+      - friendly.zookeeper.3
     networks:
-    - zookeeper
+    - kafka
 
-  friendly_kafka_3:
+  friendly.kafka.3:
     image: acntechie/kafka
-    container_name: friendly_kafka_3
+    container_name: friendly.kafka.3
     ports:
       - "9093:9093"
     environment:
       - KAFKA_BROKER_ID=3
       - KAFKA_PORT=9093
-      - ZOOKEEPER_HOSTS=friendly_zookeeper_1:2181,friendly_zookeeper_2:2181,friendly_zookeeper_3:2181
+      - ZOOKEEPER_HOSTS=friendly.zookeeper.1:2181,friendly.zookeeper.2:2181,friendly.zookeeper.3:2181
     depends_on:
-      - friendly_zookeeper_1
-      - friendly_zookeeper_2
-      - friendly_zookeeper_3
+      - friendly.zookeeper.1
+      - friendly.zookeeper.2
+      - friendly.zookeeper.3
     networks:
-    - zookeeper
+    - kafka
 
-  friendly_zookeeper_1:
+  friendly.zookeeper.1:
     image: acntechie/zookeeper
-    container_name: friendly_zookeeper_1
+    container_name: friendly.zookeeper.1
     environment:
       - ZOOKEEPER_ID=1
-      - ZOOKEEPER_HOSTS=friendly_zookeeper_1:2888:3888,friendly_zookeeper_2:2888:3888,friendly_zookeeper_3:2888:3888
+      - ZOOKEEPER_HOSTS=friendly.zookeeper.1:2888:3888,friendly.zookeeper.2:2888:3888,friendly.zookeeper.3:2888:3888
     networks:
-    - zookeeper
+    - kafka
 
-  friendly_zookeeper_2:
+  friendly.zookeeper.2:
     image: acntechie/zookeeper
-    container_name: friendly_zookeeper_2
+    container_name: friendly.zookeeper.2
     environment:
       - ZOOKEEPER_ID=2
-      - ZOOKEEPER_HOSTS=friendly_zookeeper_1:2888:3888,friendly_zookeeper_2:2888:3888,friendly_zookeeper_3:2888:3888
+      - ZOOKEEPER_HOSTS=friendly.zookeeper.1:2888:3888,friendly.zookeeper.2:2888:3888,friendly.zookeeper.3:2888:3888
     networks:
-    - zookeeper
+    - kafka
 
-  friendly_zookeeper_3:
+  friendly.zookeeper.3:
     image: acntechie/zookeeper
-    container_name: friendly_zookeeper_3
+    container_name: friendly.zookeeper.3
     environment:
       - ZOOKEEPER_ID=3
-      - ZOOKEEPER_HOSTS=friendly_zookeeper_1:2888:3888,friendly_zookeeper_2:2888:3888,friendly_zookeeper_3:2888:3888
+      - ZOOKEEPER_HOSTS=friendly.zookeeper.1:2888:3888,friendly.zookeeper.2:2888:3888,friendly.zookeeper.3:2888:3888
     networks:
-    - zookeeper
+    - kafka
 
 networks:
-  zookeeper:
+  kafka:
+    name: kafka
 ```
 
 Then run ```docker-compose up -d``` to create and start all containers in daemon mode.

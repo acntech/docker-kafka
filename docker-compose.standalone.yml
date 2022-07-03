@@ -1,23 +1,24 @@
-version: "2"
+version: "3.5"
 
 services:
-  lonely_kafka:
+  lonely.kafka:
     image: acntechie/kafka
-    container_name: lonely_kafka
+    container_name: lonely.kafka
     ports:
       - "9092:9092"
     environment:
-      - ZOOKEEPER_HOSTS=lonely_zookeeper:2181
+      - ZOOKEEPER_HOSTS=lonely.zookeeper:2181
     depends_on:
-      - lonely_zookeeper
+      - lonely.zookeeper
     networks:
-    - zookeeper
+    - kafka
 
-  lonely_zookeeper:
+  lonely.zookeeper:
     image: acntechie/zookeeper
-    container_name: lonely_zookeeper
+    container_name: lonely.zookeeper
     networks:
-    - zookeeper
+    - kafka
 
 networks:
-  zookeeper:
+  kafka:
+    name: kafka

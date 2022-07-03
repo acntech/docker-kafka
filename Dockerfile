@@ -1,8 +1,8 @@
-FROM openjdk:11-jre
+FROM eclipse-temurin:17-jre
 MAINTAINER Thomas Johansen "thomas.johansen@accenture.com"
 
 
-ARG KAFKA_VERSION=2.8.0
+ARG KAFKA_VERSION=3.2.0
 ARG SCALA_VERSION=2.13
 ARG KAFKA_MIRROR=https://dist.apache.org/repos/dist/release/kafka
 ARG KAFKA_KEY_MIRROR=https://dist.apache.org/repos/dist/release/kafka
@@ -23,25 +23,18 @@ WORKDIR /tmp
 
 RUN apt-get update && \
     apt-get -y upgrade && \
+    apt-get -y install gpg && \
     rm -rf /var/lib/apt/lists/*
 
-RUN wget --no-cookies \
-         --no-check-certificate \
-         "${KAFKA_MIRROR}/${KAFKA_VERSION}/kafka_${SCALA_VERSION}-${KAFKA_VERSION}.tgz" \
-         -O kafka.tar.gz
+RUN curl --silent --show-error --output kafka.tar.gz \
+         "${KAFKA_MIRROR}/${KAFKA_VERSION}/kafka_${SCALA_VERSION}-${KAFKA_VERSION}.tgz" && \
+    curl --silent --show-error --output kafka.tar.gz.asc \
+         "${KAFKA_KEY_MIRROR}/${KAFKA_VERSION}/kafka_${SCALA_VERSION}-${KAFKA_VERSION}.tgz.asc" && \
+    curl --silent --show-error --output kafka.KEYS \
+         "${KAFKA_KEY_MIRROR}/KEYS"
 
-RUN wget --no-cookies \
-         --no-check-certificate \
-         "${KAFKA_KEY_MIRROR}/${KAFKA_VERSION}/kafka_${SCALA_VERSION}-${KAFKA_VERSION}.tgz.asc" \
-         -O kafka.tar.gz.asc
-
-RUN wget --no-cookies \
-         --no-check-certificate \
-         "${KAFKA_KEY_MIRROR}/KEYS" \
-         -O kafka.KEYS
-
-RUN gpg --import --no-tty kafka.KEYS && \
-    gpg --batch --verify --no-tty kafka.tar.gz.asc kafka.tar.gz
+RUN gpg --quiet --import --no-tty kafka.KEYS && \
+    gpg --quiet --batch --verify --no-tty kafka.tar.gz.asc kafka.tar.gz
 
 RUN mkdir -p ${KAFKA_BASE} && \
     mkdir -p ${KAFKA_DATA_DIR} && \
@@ -54,7 +47,7 @@ RUN mkdir -p ${KAFKA_BASE} && \
     rm -f /tmp/kafka.*
 
 
-COPY resources/entrypoint.sh /entrypoint.sh
+COPY ./resources/entrypoint.sh /entrypoint.sh
 
 
 RUN chown -R root:root ${KAFKA_BASE} && \
