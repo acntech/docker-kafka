@@ -1,8 +1,8 @@
-FROM eclipse-temurin:17-jre
+FROM eclipse-temurin:latest
 MAINTAINER Thomas Johansen "thomas.johansen@accenture.com"
 
 
-ARG KAFKA_VERSION=3.2.0
+ARG KAFKA_VERSION=3.2.3
 ARG SCALA_VERSION=2.13
 ARG KAFKA_MIRROR=https://dist.apache.org/repos/dist/release/kafka
 ARG KAFKA_KEY_MIRROR=https://dist.apache.org/repos/dist/release/kafka
@@ -19,6 +19,13 @@ ENV PATH ${PATH}:${KAFKA_HOME}/bin
 
 
 WORKDIR /tmp
+
+RUN rm -rf /etc/apt/trusted.gpg.d
+RUN mkdir /etc/apt/trusted.gpg.d
+RUN chmod 755 /etc/apt/trusted.gpg.d
+
+RUN sed -i 's|^deb|deb [trusted=yes]|g' /etc/apt/sources.list
+
 
 
 RUN apt-get update && \
