@@ -1,0 +1,13 @@
+version: "3.5"
+
+services:
+  lonely.kafka:
+    image: acntechie/kafka
+    container_name: lonely.kafka
+    ports:
+      - "9092:9092"
+    networks:
+    - kafka
+networks:
+  kafka:
+    name: kafka

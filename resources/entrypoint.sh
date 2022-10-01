@@ -1,12 +1,13 @@
 #!/bin/bash
 
+
 KAFKA_CONFIGURED_FLAG="${HOME}/.kafka_configured"
 KAFKA_BROKER_ID=${KAFKA_BROKER_ID:-1}
 
 KAFKA_PORT=${KAFKA_PORT:-9092}
 KAFKA_PROTOCOL=${KAFKA_PROTOCOL:-PLAINTEXT}
 
-KAFKA_LISTENERS=${KAFKA_LISTENERS:-${KAFKA_PROTOCOL}://0.0.0.0:${KAFKA_PORT}}
+KAFKA_LISTENERS=${KAFKA_LISTENERS:-${KAFKA_PROTOCOL}://0.0.0.0:${KAFKA_PORT},CONTROLLER://:19092}
 KAFKA_ADVERTISED_LISTENERS=${KAFKA_ADVERTISED_LISTENERS:-${KAFKA_PROTOCOL}://localhost:${KAFKA_PORT}}
 
 KAFKA_AUTO_CREATE_TOPICS_ENABLE=${KAFKA_AUTO_CREATE_TOPICS_ENABLE:-true}
@@ -59,16 +60,19 @@ else
      sed -i -r 's@#?log.dirs=.*@log.dirs='"${KAFKA_DATA_DIR}"'@g' ${KAFKA_SERVER_PROPERTIES}
    fi
 
-   if [ -z "${ZOOKEEPER_HOSTS}" ]; then
-      echo "ERROR: Environment variable ZOOKEEPER_HOSTS is not defined"
-      exit 1
-   else
-      echo "Setting Kafka config zookeeper.connect=${ZOOKEEPER_HOSTS}"
-      sed -i -r 's@#?zookeeper.connect=.*@zookeeper.connect='"${ZOOKEEPER_HOSTS}"'@g' ${KAFKA_SERVER_PROPERTIES}
-   fi
-
+   echo "process.roles=broker,controller" >> ${KAFKA_SERVER_PROPERTIES}
+   echo "controller.quorum.voters=1@localhost:19092" >> ${KAFKA_SERVER_PROPERTIES}
+   echo "listener.security.protocol.map=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT" >> ${KAFKA_SERVER_PROPERTIES}
+   echo "controller.listener.names=CONTROLLER" >> ${KAFKA_SERVER_PROPERTIES}
+   echo "inter.broker.listener.name=PLAINTEXT"  >> ${KAFKA_SERVER_PROPERTIES}
+   sed -i -r '/zookeeper/s/^/#/g' ${KAFKA_SERVER_PROPERTIES}
+   KRAFT_UUID=$(${KAFKA_HOME}/bin/kafka-storage.sh random-uuid)
+   ${KAFKA_HOME}//bin/kafka-storage.sh format -t ${KRAFT_UUID} -c ${KAFKA_SERVER_PROPERTIES}
    date > ${KAFKA_CONFIGURED_FLAG}
 fi
+
+cat ${KAFKA_HOME}/config/server.properties
+
 
 echo "Starting Kafka..."
 echo "Command: ${KAFKA_SERVER_CMD}"
